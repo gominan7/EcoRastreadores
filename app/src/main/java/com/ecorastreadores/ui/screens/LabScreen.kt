@@ -18,6 +18,7 @@ import com.ecorastreadores.domain.model.ZoneType
 import com.ecorastreadores.ui.viewmodel.EcoViewModel
 import com.ecorastreadores.ui.components.SondaCompanion
 import com.ecorastreadores.ui.components.SondaState
+import com.ecorastreadores.ui.components.DetectiveBoard
 import kotlin.math.sin
 import kotlinx.coroutines.delay
 
@@ -86,6 +87,7 @@ fun LabScreen(
                 
                 var sondaState by remember { mutableStateOf(SondaState.IDLE) }
                 var sondaMessage by remember { mutableStateOf<String?>(null) }
+                var showDetectiveBoard by remember { mutableStateOf(false) }
                 
                 SondaCompanion(
                     state = sondaState,
@@ -95,7 +97,7 @@ fun LabScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Interactive module based on Zone Type
+                // Módulo interactivo o Pizarra de Detective
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -104,29 +106,40 @@ fun LabScreen(
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    when (zone.type) {
-                        ZoneType.WATER -> WaterLabSimulator(
-                            onSuccess = { viewModel.completeExpedition(currentExpedition, zone) },
-                            onSondaStateChange = { state, msg -> 
+                    if (showDetectiveBoard) {
+                        DetectiveBoard(
+                            zoneType = zone.type,
+                            onSolved = { viewModel.completeExpedition(currentExpedition, zone) },
+                            onSondaStateChange = { state, msg ->
                                 sondaState = state
-                                sondaMessage = msg 
+                                sondaMessage = msg
                             }
                         )
-                        ZoneType.AIR -> AirLabSimulator(
-                            onSuccess = { viewModel.completeExpedition(currentExpedition, zone) },
-                            onSondaStateChange = { state, msg -> 
-                                sondaState = state
-                                sondaMessage = msg 
-                            }
-                        )
-                        ZoneType.NOISE -> NoiseLabSimulator(
-                            onSuccess = { viewModel.completeExpedition(currentExpedition, zone) },
-                            onSondaStateChange = { state, msg -> 
-                                sondaState = state
-                                sondaMessage = msg 
-                            }
-                        )
-                        else -> Text("Módulo desconocido")
+                    } else {
+                        when (zone.type) {
+                            ZoneType.WATER -> WaterLabSimulator(
+                                onSuccess = { showDetectiveBoard = true },
+                                onSondaStateChange = { state, msg -> 
+                                    sondaState = state
+                                    sondaMessage = msg 
+                                }
+                            )
+                            ZoneType.AIR -> AirLabSimulator(
+                                onSuccess = { showDetectiveBoard = true },
+                                onSondaStateChange = { state, msg -> 
+                                    sondaState = state
+                                    sondaMessage = msg 
+                                }
+                            )
+                            ZoneType.NOISE -> NoiseLabSimulator(
+                                onSuccess = { showDetectiveBoard = true },
+                                onSondaStateChange = { state, msg -> 
+                                    sondaState = state
+                                    sondaMessage = msg 
+                                }
+                            )
+                            else -> Text("Módulo desconocido")
+                        }
                     }
                 }
             } else {
