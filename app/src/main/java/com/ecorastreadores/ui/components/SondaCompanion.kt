@@ -67,7 +67,7 @@ fun SondaCompanion(
             }
             SondaState.DANGER -> {
                 // Sonido de error/alerta y vibración rápida
-                view.playSoundEffect(SoundEffectConstants.NAVIGATION_CANCEL) // o CLICK
+                view.playSoundEffect(SoundEffectConstants.CLICK)
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 delay(100)
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
