@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +18,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalView
+import android.view.SoundEffectConstants
+import kotlinx.coroutines.delay
 
 enum class SondaState {
     IDLE,
@@ -44,6 +50,40 @@ fun SondaCompanion(
         animationSpec = tween(durationMillis = 500),
         label = "sonda_color"
     )
+
+    // Referencias para sonido y vibración
+    val haptic = LocalHapticFeedback.current
+    val view = LocalView.current
+
+    // Disparar efectos cuando cambie el estado
+    LaunchedEffect(state) {
+        when (state) {
+            SondaState.HAPPY -> {
+                // Sonido de acierto y vibración doble
+                view.playSoundEffect(SoundEffectConstants.CLICK)
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                delay(200)
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            }
+            SondaState.DANGER -> {
+                // Sonido de error/alerta y vibración rápida
+                view.playSoundEffect(SoundEffectConstants.NAVIGATION_CANCEL) // o CLICK
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                delay(100)
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                delay(100)
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            }
+            SondaState.HINT -> {
+                // Pequeño toque suave
+                view.playSoundEffect(SoundEffectConstants.NAVIGATION_UP)
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            }
+            SondaState.IDLE -> {
+                // Sin efecto al volver a neutral
+            }
+        }
+    }
 
     // Animación de flotación (IDLE, HINT) o salto (HAPPY) o vibración (DANGER)
     val infiniteTransition = rememberInfiniteTransition(label = "sonda_motion")
