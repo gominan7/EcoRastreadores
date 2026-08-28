@@ -28,18 +28,21 @@ fun DetectiveBoard(
         ZoneType.WATER -> "Muestra: Agua Ácida"
         ZoneType.AIR -> "Muestra: Exceso PM2.5"
         ZoneType.NOISE -> "Muestra: Ondas Fuertes"
+        else -> "Muestra: Desconocida"
     }
     
     val suspects = when(zoneType) {
         ZoneType.WATER -> listOf("Residuos Naturales", "Tubería de Fábrica", "Lluvia Común")
         ZoneType.AIR -> listOf("Polvo de Árboles", "Humo de Tráfico", "Neblina")
         ZoneType.NOISE -> listOf("Canto de Pájaros", "Obras de Construcción", "Viento Fuerte")
+        else -> listOf("Opción 1", "Opción 2", "Opción 3")
     }
     
     val correctSuspect = when(zoneType) {
         ZoneType.WATER -> "Tubería de Fábrica"
         ZoneType.AIR -> "Humo de Tráfico"
         ZoneType.NOISE -> "Obras de Construcción"
+        else -> "Opción 1"
     }
 
     var selectedClue by remember { mutableStateOf(false) }
